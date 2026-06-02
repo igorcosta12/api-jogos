@@ -57,6 +57,18 @@ app.get('/jogos/:id', (req, res) => {
 app.post('/jogos', (req, res) => {
   const { nome, tipo, nota, review } = req.body;
 
+  if (!nome || !tipo || nota === undefined || !review) {
+    return res.status(400).json({ error: "Todos os campos são obrigatórios no request." });
+  }
+
+  if (typeof nome !== 'string' || typeof tipo !== 'string' || typeof review !== 'string') {
+    return res.status(400).json({ error: "Os campos 'nome', 'tipo' e 'review' devem ser textos." });
+  }
+
+  if (typeof nota !== 'number' || isNaN(nota) || nota < 0 || nota > 10) {
+    return res.status(400).json({ error: "A nota deve ser um número entre 0 e 10." });
+  }
+
   const novoJogo = {
     id: getNextId(),
     nome,
@@ -74,6 +86,14 @@ app.put('/jogos/:id', (req, res) => {
   const { nome, tipo, nota, review } = req.body;
   if (!nome || !tipo || nota === undefined || !review) {
     return res.status(400).json({ error: "Todos os campos são obrigatórios no request." });
+  }
+
+  if (typeof nome !== 'string' || typeof tipo !== 'string' || typeof review !== 'string') {
+    return res.status(400).json({ error: "Os campos 'nome', 'tipo' e 'review' devem ser textos." });
+  }
+
+  if (typeof nota !== 'number' || isNaN(nota) || nota < 0 || nota > 10) {
+    return res.status(400).json({ error: "A nota deve ser um número entre 0 e 10." });
   }
 
   const index = jogos.findIndex(j => j.id === id);
@@ -104,6 +124,10 @@ app.delete('/jogos/:id', (req, res) => {
   }
 });
 
-app.listen(PORT, () => {
-  console.log(`API rodando na porta ${PORT}`);
-});
+if (require.main === module) {
+  app.listen(PORT, () => {
+    console.log(`API rodando na porta ${PORT}`);
+  });
+}
+
+module.exports = app;
